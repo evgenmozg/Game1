@@ -2,12 +2,12 @@ import pygame
 
 level = [
     '--------------------------------------------------------------------------------------------------------',
-    '-                              -                                        -----                          -',
-    '-           --                 -                                      -----                          -',
-    '-                              -                                      -----                          -',
-    '-            --                -                                      -----                          -',
-    '-                              -                                      -----                          -',
-    '-             --               -                                      -----                          -',
+    '-                              -                                      -----                            -',
+    '-           --                 -                                      -----                            -',
+    '-                              -                                      -----                            -',
+    '-            --                -                                      -----                            -',
+    '-                              -                                      -----                            -',
+    '-             --               -                                      -----                            -',
     '-                              -                                                                       -',
     '-                              -                                                                       -',
     '-                              -                                                                       -',
@@ -27,7 +27,7 @@ level = [
     '-                       -               ----                             -----                         -',
     '-                       -               ----                                                           -',
     '-                       -               ----                                                           -',
-    '-                       -               ----                                                           -',
+    '--------------------------------------------------------------------------------------------------------',
     ]
 WIN_WIDTH, WIN_HEIGHT = 780, 630
 BG_COLOR = (192, 192, 192)
@@ -38,12 +38,14 @@ RED = (255, 0, 0)
 FPS = 60
 clock = pygame.time.Clock()
 PLAYER_SIZE = 40
-BG_SPEED = 0.3
+BG_SPEED = 2
 dx = 0
 PLAYER_SPEED = 3
 penalty = 0
+BTN_W, BTN_H = 220, 60
 
 pygame.init()
+text = pygame.font.SysFont('Arial', 22, True, False)
 pygame.display.set_caption('первая игра')
 screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 
@@ -56,7 +58,14 @@ pygame.draw.arc(player, (255, 215, 0), (8, 12, 24, 20,), 3.6, 6.0, 3)
 player_rect = player.get_rect(center=(WIN_WIDTH // 2, WIN_HEIGHT // 2))
 
 text = pygame.font.SysFont('Arial', 22, True, False)
+text_xy = ((WIN_WIDTH - text.size(f'Штрафных очков {round(penalty)}')[0]) // 2, 30)
 
+btn = pygame.Surface((BTN_W, BTN_H))
+text1 = 'ИГРАТЬ СНОВА ?'
+text_xy = text.size(text1)
+
+# print(text.size(f'Штрафных очков {round(penalty)}')[0])
+# print(text_xy)
 run = True
 while run:
     for e in pygame.event.get():
@@ -76,9 +85,14 @@ while run:
     screen.fill(BG_COLOR)
 
     dx -= BG_SPEED
+    if dx > -WIN_WIDTH * 4:
+        dx -= BG_SPEED
+    else:
+        if player_rect.x < WIN_WIDTH - PLAYER_SIZE:
+            player_rect.x += PLAYER_SPEED
+
     x = dx
     y = 0
-
     for row in level:
         for col in row:
             if col == '-':
@@ -97,5 +111,6 @@ while run:
         text.render(f'Штрафных очков {round(penalty)}', True, RED, None), 
         (WIN_WIDTH - text.size(f'Штрафных очков {round(penalty)}')[0] - 5, 30)
     )
+
     pygame.display.update()
     clock.tick(FPS)
