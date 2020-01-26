@@ -43,18 +43,26 @@ dx = 0
 PLAYER_SPEED = 3
 penalty = 0
 BTN_W, BTN_H = 220, 60
+GOLD = (255, 215, 10)
+BLUE = (0, 0, 255)
+RED = (255, 0, 0)
 
 pygame.init()
 text = pygame.font.SysFont('Arial', 22, True, False)
 pygame.display.set_caption('первая игра')
 screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 
-player = pygame.Surface((PLAYER_SIZE, PLAYER_SIZE))
+player = pygame.Surface((PLAYER_SIZE, PLAYER_SIZE), pygame.SRCALPHA)
 player.set_colorkey((0, 0, 0))
-pygame.draw.circle(player, (0, 0, 250), (PLAYER_SIZE // 2, PLAYER_SIZE // 2), PLAYER_SIZE // 2)
-pygame.draw.circle(player, (255, 215, 0), (12, 15), 4)
-pygame.draw.circle(player, (255, 215, 0), (28, 15), 4)
-pygame.draw.arc(player, (255, 215, 0), (8, 12, 24, 20,), 3.6, 6.0, 3)
+
+
+def face(color):
+    pygame.draw.circle(player, (0, 0, 250), (PLAYER_SIZE // 2, PLAYER_SIZE // 2), PLAYER_SIZE // 2)
+    pygame.draw.circle(player, GOLD, (12, 15), 4)
+    pygame.draw.circle(player, GOLD, (28, 15), 4)
+    pygame.draw.arc(player, GOLD, (8, 12, 24, 20,), 3.6, 6.0, 3)
+
+
 player_rect = player.get_rect(center=(WIN_WIDTH // 2, WIN_HEIGHT // 2))
 
 text = pygame.font.SysFont('Arial', 22, True, False)
@@ -64,8 +72,9 @@ btn = pygame.Surface((BTN_W, BTN_H))
 text1 = 'ИГРАТЬ СНОВА ?'
 text_xy = text.size(text1)
 
-# print(text.size(f'Штрафных очков {round(penalty)}')[0])
-# print(text_xy)
+
+
+face(BLUE)
 run = True
 while run:
     for e in pygame.event.get():
@@ -84,13 +93,14 @@ while run:
 
     screen.fill(BG_COLOR)
 
-    dx -= BG_SPEED
     if dx > -WIN_WIDTH * 4:
         dx -= BG_SPEED
     else:
         if player_rect.x < WIN_WIDTH - PLAYER_SIZE:
             player_rect.x += PLAYER_SPEED
 
+    screen.fill(BG_COLOR)
+    face(BLUE)
     x = dx
     y = 0
     for row in level:
@@ -100,6 +110,7 @@ while run:
                 brick = pygame.draw.rect(screen, BRICK_COLOR, [x, y, BRICK_WIDTH, BRICK_HEIGHT])
                 pygame.draw.rect(screen, (BRICK_COLOR_2), [x, y, BRICK_WIDTH, BRICK_HEIGHT], 2)
                 if brick.colliderect(player_rect):
+                    face(RED)
                     penalty += 0.1
             x += BRICK_HEIGHT
         y += BRICK_HEIGHT
