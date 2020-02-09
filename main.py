@@ -12,7 +12,7 @@ level = [
     '-                              -                                                                       -',
     '-                              -                                                                       -',
     '-                              -                                                                       -',
-    '-                                                --                  -------                           -',   
+    '-                                                --                  -------                           -',
     '-                                                                                                      -',
     '-                                                                                                      -',
     '-                                                                                                      -',
@@ -28,7 +28,7 @@ level = [
     '-                       -               ----                                                           -',
     '-                       -               ----                                                           -',
     '--------------------------------------------------------------------------------------------------------',
-    ]
+]
 WIN_WIDTH, WIN_HEIGHT = 780, 630
 BG_COLOR = (192, 192, 192)
 BRICK_COLOR_2 = (255, 128, 0)
@@ -57,7 +57,7 @@ player.set_colorkey((0, 0, 0))
 
 
 def face(color):
-    pygame.draw.circle(player, (0, 0, 250), (PLAYER_SIZE // 2, PLAYER_SIZE // 2), PLAYER_SIZE // 2)
+    pygame.draw.circle(player, color, (PLAYER_SIZE // 2, PLAYER_SIZE // 2), PLAYER_SIZE // 2)
     pygame.draw.circle(player, GOLD, (12, 15), 4)
     pygame.draw.circle(player, GOLD, (28, 15), 4)
     pygame.draw.arc(player, GOLD, (8, 12, 24, 20,), 3.6, 6.0, 3)
@@ -69,19 +69,30 @@ text = pygame.font.SysFont('Arial', 22, True, False)
 text_xy = ((WIN_WIDTH - text.size(f'Штрафных очков {round(penalty)}')[0]) // 2, 30)
 
 btn = pygame.Surface((BTN_W, BTN_H))
+btn.fill(BLUE)
 text1 = 'ИГРАТЬ СНОВА ?'
-text_xy = text.size(text1)
+text_pos = text.size(text1)
+
+color = BLUE
+face(color)
 
 
-
-face(BLUE)
 run = True
 while run:
     for e in pygame.event.get():
         if e.type == pygame.QUIT or e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
             run = False
-
+        elif e.type == pygame.MOUSEBUTTONDOWN:
+            mouse_pos = pygame.mouse.get_pos()
+            if (
+                    mouse_pos[0] >= (WIN_WIDTH - BTN_W) // 2
+                    and mouse_pos[0] <= (WIN_WIDTH + BTN_W) // 2
+                    and mouse_pos[1] >= WIN_HEIGHT // 2
+                    and mouse_pos[1] <= WIN_WIDTH // 2 + BTN_H
+            ):
+                print('!!!!!!!!!!', end='')
     keys = pygame.key.get_pressed()
+
     if keys[pygame.K_RIGHT]:
         player_rect.x += PLAYER_SPEED
     if keys[pygame.K_LEFT]:
@@ -99,8 +110,10 @@ while run:
         if player_rect.x < WIN_WIDTH - PLAYER_SIZE:
             player_rect.x += PLAYER_SPEED
 
+    color = BLUE
     screen.fill(BG_COLOR)
-    face(BLUE)
+    face(color)
+
     x = dx
     y = 0
     for row in level:
@@ -110,18 +123,23 @@ while run:
                 brick = pygame.draw.rect(screen, BRICK_COLOR, [x, y, BRICK_WIDTH, BRICK_HEIGHT])
                 pygame.draw.rect(screen, (BRICK_COLOR_2), [x, y, BRICK_WIDTH, BRICK_HEIGHT], 2)
                 if brick.colliderect(player_rect):
-                    face(RED)
-                    penalty += 0.1
+                    if player_rect.x < WIN_WIDTH - PLAYER_SIZE * 2:
+                        if color == BLUE:
+                            color = RED
+                            face(color)
+                        penalty += 0.1
             x += BRICK_HEIGHT
         y += BRICK_HEIGHT
         x = dx
 
+    if player_rect.x < WIN_WIDTH - PLAYER_SIZE:
     screen.blit(player, (player_rect))
     pygame.display.set_caption(f' FPS: {round(clock.get_fps(), 2)}')
     screen.blit(
-        text.render(f'Штрафных очков {round(penalty)}', True, RED, None), 
-        (WIN_WIDTH - text.size(f'Штрафных очков {round(penalty)}')[0] - 5, 30)
-    )
-
+        text.render(f'Штрафных очков {round(penalty)}', True, RED, None), text_xy)
+    else:
+        screen.blit(btn, ((WIN_WIDTH - BTN_W) // 2, WIN_HEIGHT // 2))
+        btn.blit(text.render(text1, True, RED, None), ((B)) )
+        
     pygame.display.update()
     clock.tick(FPS)
